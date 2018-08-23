@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="1 seconds">
+    <springProperty scope="context" name="logging.root" source="logging.root"/>
+    <springProperty scope="context" name="logging.level" source="logging.level" defaultValue="INFO"/>
+
+    <contextName>demo</contextName>
+    <jmxConfigurator/>
+    <!-- direct log messages to stdout -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <Target>System.out</Target>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%t] %-5p |-%c{35}:%L - %m %n</pattern>
+        </encoder>
+    </appender>
+
+    <!--  -->
+    <appender name="ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logging.root}/demo.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logging.root}/%d{yyyy-MM,aux}/demo.%d.gz</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss}[%t]%-5p %c{36}.%M\(%L\) %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="REST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logging.root}/demo_rest.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logging.root}/%d{yyyy-MM,aux}/demo_rest.%d.gz</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss}[%t]%-5p %c{36}.%M\(%L\) %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DEPENDENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logging.root}/demo_dependent.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logging.root}/%d{yyyy-MM,aux}/demo_dependent.%d.gz</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss}[%t]%-5p %c{36}.%M\(%L\) %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.web" level="${logging.level}"/>
+    <logger name="com.example.demo.web" level="${logging.level}"/>
+    <logger name="com.example.demo.web.mapper" level="DEBUG"/>
+
+    <!-- 请求日志 -->
+    <logger name="rest" level="INFO" additivity="false">
+        <appender-ref ref="REST"/>
+    </logger>
+    <!-- 定义依赖接口日志 -->
+    <logger name="dependent" level="info" additivity="false">
+        <appender-ref ref="DEPENDENT"/>
+    </logger>
+
+    <root level="${logging.level}">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="ALL"/>
+    </root>
+</configuration>
